@@ -1,0 +1,62 @@
+use companydb;
+-- 1
+select FName, LName, SSN
+from Employee
+where Salary = (select min(Salary) as minSalary from Employee);
+
+-- 2
+select FName, LName
+from Employee
+where SSN in (select ESSN from Dependent where Relationship = 'Spouse')
+and SSN in (select ESSN from Dependent where Relationship = 'Daughter');
+
+-- 3
+select FName, LName, PName
+from Employee
+join Works_On on Employee.SSN = Works_On.ESSN
+join Project on Works_On.PNo = Project.PNumber
+where LName in ('Wong','Borg','English');
+
+-- 4
+select FName, LName, SSN, Salary
+from Employee join Department
+on Employee.SSN = Department.MGRSSN
+WHERE Employee.Salary > 30000
+AND Employee.Sex = 'M';
+
+-- 5
+select distinct PName, PNumber
+from Employee
+join Works_On on SSN = ESSN
+join Project on PNumber = PNo
+where (Pno in (select PNo from Works_On join Employee on SSN = ESSN where LName = 'Narayan')
+ and (Pno in (select PNo from Works_On join Employee on SSN = ESSN where LName = 'Jabbar')));
+
+-- 6
+select FName, LName, year(curdate()) - year(Dependent.Bdate) as appro_age
+from Employee join Dependent on SSN = ESSN
+where year(Dependent.Bdate) > 1970;
+
+-- 7
+select FName, LName, PName, Hours
+from Employee
+join Works_On on Employee.SSN = Works_On.ESSN
+join Project on Project.PNumber = Works_On.PNo
+where PName  in (select PName from Project where PLocation = 'Houston');
+
+-- 8
+select e1.FName, e1.LName, e2.FName, e2.LName
+from Employee e1
+left join Employee e2 on e1.SuperSSN = e2.SSN;
+
+-- 9
+select PName, FName, LName, PLocation
+from Employee
+join Department on SSN = MGRSSN
+join Project on Department.DNumber = Project.DNum;
+
+-- 10
+select FName, LName
+from Employee
+join Department on SSN = MGRSSN
+where Salary in (select max(Salary) as maxSalary from Employee);
